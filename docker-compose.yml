@@ -1,0 +1,13 @@
+version: "3.3"
+services:
+  web:
+    build: .
+    image: world_of_game/flask
+    container_name: wog-flask
+    ports:
+      - "8777:5000"
+
+  test:
+    build: ./tests
+    image: wog-test
+    container_name: test

@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+        stages {
+            stage('GIt checkout') {
+                steps {
+                    git branch: 'master',
+                    credentialsId: 'orlyAloncohen',
+                    url: 'https://github.com/OrlyAloncohen/OrlyCohen-DevOps.git'
+                }
+            }
+
+            stage('building docker file ') {
+                steps {
+                    sh 'sudo docker build -t orly/devops_wog .'
+                }
+            }
+
+            stage('Run docker image') {
+                steps {
+                    sh 'docker run --name docker-game -d -t -p 8777:5000 devops_wog '
+                }
+            }
+
+            stage ('Test') {
+                steps {
+                    sh 'docker exec -t -d docker-game python /MainScores.py'
+                    sh 'docker exec -t -d docker-game python /E2E.py'
+                   }
+            }
+
+            stage ('stop and delete') {
+                steps{
+                    sh 'docker stop docker-game'
+                    sh 'sudo docker rm docker-game'
+                }
+            }
+
+            stage('Push image') {
+                 steps{
+                      sh 'docker push orly/devops_wog'
+                 }
+            }
+    }
+}
